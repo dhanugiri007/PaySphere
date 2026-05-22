@@ -6,7 +6,9 @@ const emailService = require("../services/email.service");
 * - POST /api/auth/register
 */
 async function userRegisterController(req,res) {
+    try {
 
+    
     const {email,password,name} = req.body;
 
     const isExists = await userModel.findOne({
@@ -40,6 +42,10 @@ async function userRegisterController(req,res) {
     });
 
     await emailService.sendRegistrationEmail(user.email,user.name);
+} catch(error) {
+    console.log(error);
+}
+
 }
 
  /**
@@ -48,6 +54,10 @@ async function userRegisterController(req,res) {
 */
 
 async function userLoginController(req,res) {
+
+    try {
+
+    
     const {email,password} = req.body;
 
     const user = await userModel.findOne({email}).select("+password");
@@ -78,6 +88,9 @@ async function userLoginController(req,res) {
             name : user.name
         }
     });
+} catch(error) {
+    console.log(error);
+}
 }
 
 
