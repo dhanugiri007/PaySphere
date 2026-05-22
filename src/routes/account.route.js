@@ -9,6 +9,7 @@ const router = express.Router();
  * -Protected Route
  */
 
-router.post("/",authMiddleware.authMiddleware, accountController.createAccountController);
+router.post("/create-account",authMiddleware.authMiddleware, accountController.createAccountController);
+router.post("/deposit",authMiddleware.authMiddleware,accountController.depositController);
 
 module.exports = router;
