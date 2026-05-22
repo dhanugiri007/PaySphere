@@ -3,8 +3,13 @@ const ledgerModel = require("../models/ledger.model");
 const accountModel = require("../models/account.model");
 const emailService = require("../services/email.service");
 const mongoose = require('mongoose');
+
+
 async function createTransaction(req,res) {
 
+    try {
+
+    
     const {fromAccount,toAccount,amount,idempotencyKey} = req.body
 
     if(!fromAccount || !toAccount || !amount || !idempotencyKey) {
@@ -14,7 +19,7 @@ async function createTransaction(req,res) {
     }
 
     const fromUserAccount = await accountModel.findOne({
-        id: fromAccount
+        _id: fromAccount
     });
 
     const toUserAccount = await accountModel.findOne({
@@ -59,7 +64,7 @@ async function createTransaction(req,res) {
         }
     }
 
-    if(fromUserAccount !== "ACTIVE" || toUserAccount !== "ACTIVE") {
+    if(fromUserAccount.status !== "ACTIVE" || toUserAccount.status !== "ACTIVE") {
         return res.status(400).json({
             message : "Both from Account and toAccount must be ACTIVE to process transaction"
         });
@@ -76,31 +81,30 @@ async function createTransaction(req,res) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    const transaction = await transactionModel.create({
-        fromAccount,
-        toAccount,
-        amount,
-        idempotencyKey,
-        status: "PENDING"
-    },{session});
+    const transaction = await transactionModel.create([{
+    fromAccount,
+    toAccount,
+    amount,
+    idempotencyKey,
+    status: "PENDING"
+}], {session});
 
-    const debitledgerEntry = await ledgerModel.create({
-        account : fromAccount,
-        amount : amount,
-        transaction : transaction._id,
-        type : "DEBIT"
-    }, {session});
+    const creditledgerEntry = await ledgerModel.create([{
+    account: toAccount,
+    amount: amount,
+    transaction: transaction[0]._id,
+    type: "CREDIT"
+}], {session});
 
-    const creditledgerEntry = await ledgerModel.create({
-        account: toAccount,
-        amount: amount,
-        transaction: transaction._id,
-        type: "CREDIT",
-    },{session});
+    const debitledgerEntry = await ledgerModel.create([{
+    account: fromAccount,
+    amount: amount,
+    transaction: transaction[0]._id,
+    type: "DEBIT"
+}], {session});
 
-    transaction.status = "COMPLETED";
-
-    await transaction.save({session});
+    transaction[0].status = "COMPLETED";
+    await transaction[0].save({session});
 
     await session.commitTransaction();
     session.endSession();
@@ -110,7 +114,10 @@ async function createTransaction(req,res) {
     return res.status(201).json({
         message: "Transaction completed successfully",
         transaction: transaction
-    })
+    });
+} catch(error) {
+    console.log(error);
+}
 }
 
 
