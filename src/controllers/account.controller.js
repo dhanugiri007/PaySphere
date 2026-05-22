@@ -1,6 +1,7 @@
 const accountModel = require("../models/account.model");
 const ledgerModel = require("../models/ledger.model");
 const mongoose = require('mongoose');
+const transactionModel = require("../models/transaction.model");
 
 async function createAccountController(req,res) {
 
@@ -56,7 +57,53 @@ async function depositController(req,res) {
     }
 }
 
+async function getBalanceController(req, res) {
+    try {
+        const account = await accountModel.findOne({ user: req.user._id });
+
+        if (!account) {
+            return res.status(404).json({ message: "Account not found" });
+        }
+
+        const balance = await account.getBalance();
+
+        return res.status(200).json({
+            balance,
+            currency: account.currency
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+async function getTransactionHistoryController(req, res) {
+    try {
+        const account = await accountModel.findOne({ user: req.user._id });
+
+        if (!account) {
+            return res.status(404).json({ message: "Account not found" });
+        }
+
+        const transactions = await transactionModel.find({
+            $or: [
+                { fromAccount: account._id },
+                { toAccount: account._id }
+            ]
+        }).sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            transactions
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports =  {
     createAccountController,
-    depositController
+    depositController,
+    getBalanceController,
+    getTransactionHistoryController
 }
