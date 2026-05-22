@@ -189,5 +189,6 @@ POST /api/auth/logout
 // No body required
 ```
 
-
+## LIVE API
+https://paysphere-ih0s.onrender.com/
 
