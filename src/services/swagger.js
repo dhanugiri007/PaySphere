@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "https://paysphere-ih0s.onrender.com/",
         description: "Local server",
       },
     ],
@@ -21,11 +21,16 @@ const options = {
           scheme: "bearer",
           bearerFormat: "JWT",
         },
+        cookieAuth: {
+          type: "apiKey",
+          in: "cookie",
+          name: "token",
+        },
       },
     },
-    security: [{ bearerAuth: [] }],
+    security: [{ bearerAuth: [] }, { cookieAuth: [] }],
   },
-  apis: ["./routes/*.js"], // IMPORTANT
+  apis: ["./src/routes/*.js"], 
 };
 
 module.exports = swaggerJSDoc(options);
