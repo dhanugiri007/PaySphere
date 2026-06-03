@@ -10,7 +10,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://paysphere-ih0s.onrender.com/",
+        url: "https://paysphere-ih0s.onrender.com",
         description: "production server",
       },
        {
