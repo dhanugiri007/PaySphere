@@ -1,4 +1,5 @@
 const swaggerJSDoc = require("swagger-jsdoc");
+const path = require("path"); 
 
 const options = {
   definition: {
@@ -11,12 +12,12 @@ const options = {
     servers: [
       {
         url: "https://paysphere-ih0s.onrender.com",
-        description: "production server",
+        description: "Production server",
       },
-       {
-    url: "http://localhost:3000",
-    description: "Local server",
-  },
+      {
+        url: "http://localhost:3000",
+        description: "Local server",
+      },
     ],
     components: {
       securitySchemes: {
@@ -34,7 +35,7 @@ const options = {
     },
     security: [{ bearerAuth: [] }, { cookieAuth: [] }],
   },
-  apis: ["./src/routes/*.js"], 
+  apis: [path.join(__dirname, "../routes/*.js")], // ✅ only change
 };
 
 module.exports = swaggerJSDoc(options);
