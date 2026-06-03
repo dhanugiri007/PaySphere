@@ -11,8 +11,12 @@ const options = {
     servers: [
       {
         url: "https://paysphere-ih0s.onrender.com/",
-        description: "Local server",
+        description: "production server",
       },
+       {
+    url: "http://localhost:3000",
+    description: "Local server",
+  },
     ],
     components: {
       securitySchemes: {
